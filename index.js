@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const app=express();
 app.use(express.json())
 const { UserModel}= require("./Model/user.model")
+const {NoteModel}=require("./Model/note.model")
 
 app.get("/", (req,res)=>[
     res.send("Welcome to home page")
@@ -30,13 +31,28 @@ app.post("/login",async(req,res)=>{
     let hash = user.password;
     bcrypt.compare(password, hash, function(err,result){
         if(result){
-            var token = jwt.sign({ email:email }, 'secret',{ expiresIn: "1h" });
+            var token = jwt.sign({ email:email }, 'secret');
             res.send({"msg":"login successful", "token":token})
         }
         else{
             res.send("Login Failed, invalid creds")
         }
     })
+})
+
+app.post("/note/create", (req,res)=>{
+    const token=req.headers.authorization.split(" ")[1]
+    jwt.verify(token, 'secret', async function(err, decoded) {
+        if(err){
+            res.send("please login")
+        }
+        else{
+            const {heading, note,tag}= req.body;
+            const new_note=new NoteModel({heading,note,tag,token})
+            await new_note.save();
+            res.send("Successfully added")
+        }
+      });
 })
 
 
