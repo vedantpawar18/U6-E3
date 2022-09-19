@@ -55,6 +55,48 @@ app.post("/note/create", (req,res)=>{
       });
 })
 
+app.get("/note", (req,res)=>{
+    const token=req.headers.authorization.split(" ")[1]
+    jwt.verify(token, 'secret', async function(err, decoded) {
+        if(err){
+            res.send("please login")
+        }
+        else{
+            const result= await NoteModel.find({token:token});
+            res.send(result) 
+        }
+      });
+})
+
+app.put("/note/:id", (req,res)=>{
+    var idparam = req.params["id"]
+    const token=req.headers.authorization.split(" ")[1]
+    jwt.verify(token, 'secret', async function(err, decoded) {
+        if(err){
+            res.send("please login")
+        }
+        else{
+            const payload=req.body;
+            await NoteModel.updateOne({id:idparam,token:token},{$set:{heading:payload.heading, note:payload.note, tag:payload.tag}})
+            res.send("note updated")
+        }
+      });
+})
+
+app.delete("/note/:id", (req,res)=>{
+    var idparam = req.params["id"]
+    const token=req.headers.authorization.split(" ")[1]
+    jwt.verify(token, 'secret', async function(err, decoded) {
+        if(err){
+            res.send("please login")
+        }
+        else{
+            var id = req.params["id"]
+            await TodoModel.deleteOne({id:id, token:token})
+            res.send("note deleted")
+        }
+      });
+})
 
 
 app.listen(8080,async()=>{
