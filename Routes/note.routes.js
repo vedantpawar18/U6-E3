@@ -22,8 +22,8 @@ noteRouter.post("/create", validator,(req,res)=>{
             res.send("please login")
         }
         else{
-            const {heading, note,tag}= req.body;
-            const new_note=new NoteModel({heading,note,tag,token})
+            const {id,heading, note,tag}= req.body;
+            const new_note=new NoteModel({id,heading,note,tag,token})
             await new_note.save();
             res.send("Successfully added")
         }
@@ -67,7 +67,7 @@ noteRouter.delete("/:id", (req,res)=>{
         }
         else{
             var id = req.params["id"]
-            await TodoModel.deleteOne({id:id, token:token})
+            await NoteModel.deleteOne({id:idparam, token:token})
             res.send("note deleted")
         }
       });
