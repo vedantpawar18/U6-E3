@@ -4,7 +4,18 @@ const {NoteModel}= require("../Model/note.model")
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-noteRouter.post("/create", (req,res)=>{
+const validator= (req, res, next)=>{
+    let {heading, note, tag}= req.body;
+    if (typeof(heading)=="string" && typeof(note)=="string" && typeof(tag)=="string" )
+    {
+     next()
+    }
+    else{
+     res.send("Validation Failed")
+    }
+ }
+
+noteRouter.post("/create", validator,(req,res)=>{
     const token=req.headers.authorization.split(" ")[1]
     jwt.verify(token, 'secret', async function(err, decoded) {
         if(err){
